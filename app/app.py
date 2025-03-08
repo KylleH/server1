@@ -26,6 +26,9 @@ from PIL import Image
 
 
 # Define data directories
+# Update the model path to use the WSL path
+model_path = "/mnt/c/Users/kylle/Desktop/Web app/venv/cnn_classifier.keras" #mnt for linux
+model = load_model(model_path)
 output_dir_pic = "output/pictures" # this is on server virtual stuff buddy
 output_dir_data = "output/data"
 output_dir_fft = "output/fft"
