@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ESP32 ADC Data Display</title>
+  <script src="config.js"></script>
+  <script src="script2.js"></script>
+  <link rel="stylesheet" href="styles.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f4f4f9;
+      text-align: center;
+    }
+
+    #controls {
+      padding: 1px;
+      background-color: #007BFF;
+      color: white;
+    }
+
+    #menu {
+      margin: 10px 0;
+    }
+
+    #log-container {
+      width: 90%;
+      max-width: 800px;
+      height: 30px;
+      overflow-y: auto;
+      background-color: #fff;
+      border: 1px solid #ccc;
+      padding: 10px;
+      margin: 20px auto;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .log-entry {
+      padding: 5px;
+      margin: 5px 0;
+      border-bottom: 1px solid #eee;
+    }
+
+    .chart-container {
+      width: 90%;
+      max-width: 900px;
+      margin: 20px auto;
+    }
+
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      margin: 5px;
+      border: none;
+      cursor: pointer;
+      border-radius: 5px;
+    }
+
+    button.active {
+      border: 3px solid black;
+    }
+
+    #power-factor-container {
+      margin: 20px auto;
+      padding: 10px;
+      background-color: #fff;
+      border: 1px solid #ccc;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      width: 90%;
+      max-width: 900px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Controls Section -->
+  <div id="controls">
+    <h1>ESP32 ADC Data Display</h1>
+    
+    <div id="menu">
+      <label for="navigation">Navigate: </label>
+      <select id="navigation" onchange="navigateToPage(this.value)">
+        <option value="index.html">Data Visualization</option>
+        <option value="monitor.html">Monitor</option>
+        <option value="phase.html" selected>Phase Monitor</option>
+      </select>
+    </div>
+
+    <button id="stopButton">Stop</button>
+    <button id="resumeButton">Resume</button>
+  </div> 
+
+  <!-- Log Section -->
+  <div id="log-container"></div> 
+
+  <!-- ADC Chart for Channels 1-3 -->
+  <div class="chart-container">
+    <h2>ADC Data Visualization (Channels 1-3)</h2>
+    <canvas id="adc1Chart"></canvas>
+  </div>
+
+  <!-- ADC Chart for Channels 4-6 -->
+  <div class="chart-container">
+    <h2>ADC Data Visualization (Channels 4-6)</h2>
+    <canvas id="adc2Chart"></canvas>
+  </div>
+
+  <!-- FFT Chart -->
+  <div class="chart-container">
+    <h2>FFT Data Visualization</h2>
+    <canvas id="fftChart"></canvas>
+  </div>
+
+  <!-- Power Factor Display -->
+  <div id="power-factor-container">
+    <header>Power Factor</header>
+    <p>Phase 1 (Channels 3 & 4): <span id="power-factor-phase1">0.00</span></p>
+    <p>Phase 2 (Channels 1 & 5): <span id="power-factor-phase2">0.00</span></p>
+    <p>Phase 3 (Channels 2 & 6): <span id="power-factor-phase3">0.00</span></p>
+  </div>
+
+  <script>
+    function navigateToPage(page) {
+      if (page) {
+        window.location.href = page;
+      }
+    }
+  </script> 
+
+</body>
+</html>

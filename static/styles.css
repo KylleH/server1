@@ -1,0 +1,102 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+header {
+    background-color: #525252;
+    color: white;
+    padding: 10px 0;
+    text-align: center;
+}
+
+nav button {
+    background-color: #444;
+    color: rgb(255, 1, 1);
+    border: none;
+    padding: 10px 20px;
+    margin: 0 5px;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+nav button:hover {
+    background-color: #555;
+}
+
+main {
+    padding: 20px;
+}
+
+.page {
+    display: none;
+}
+
+.page.active {
+    display: block;
+}
+
+#controls {
+    position: fixed; /* Makes the controls fixed at the top */
+    top: 0; /* Positions the controls at the very top of the viewport */
+    left: 0; /* Aligns the controls to the left */
+    width: 100%; /* Ensures the controls span the full width of the screen */
+    background-color: #f4f4f4; /* Light background for better visibility */
+    padding: 10px 20px; /* Adds padding for spacing */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); /* Adds a subtle shadow for depth */
+    z-index: 1000; /* Ensures the controls stay above other elements */
+    display: flex; /* Aligns the buttons in a row */
+    justify-content: space-around; /* Adds equal spacing between buttons */
+    align-items: center; /* Vertically aligns buttons */
+}
+
+#controls button {
+    padding: 10px 15px;
+    font-size: 14px;
+    cursor: pointer;
+    border: none;
+    border-radius: 5px;
+    transition: background-color 0.3s;
+    background-color:gray;
+    color: white;
+}
+
+#controls button:hover {
+    background-color: #ddd; /* Light gray background on hover */
+}
+
+#canvas {
+    display: block;
+    margin: 20px auto;
+    border: 1px solid #ccc;
+}
+#menu {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+#menu label {
+    font-size: 16px;
+    font-weight: bold;
+    margin-right: 10px;
+}
+
+#menu select {
+    font-size: 16px;
+    padding: 5px 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: #fff;
+    color: #333;
+    cursor: pointer;
+}
+
+#menu select:hover {
+    border-color: #888;
+}
+
+#menu select:focus {
+    outline: none;
+    border-color: #555;
+}

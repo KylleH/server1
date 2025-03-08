@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="styles.css">
+    <script src="config.js"></script>
+    <title>Monitor</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        h1 {
+            text-align: center;
+        }
+        #menu {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        #content {
+            text-align: center;
+        }
+        .section {
+            margin: 20px 0;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            background-color: #f9f9f9;
+        }
+        .btn {
+            padding: 10px 20px;
+            margin: 10px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .btn:hover {
+            background-color: #0056b3;
+        }
+        #plot-container img {
+            max-width: 100%;
+            height: auto;
+            margin: 20px 0;
+        }
+        .output {
+            font-weight: bold;
+            margin-top: 10px;
+        }
+        .feedback-buttons {
+            margin-top: 10px;
+        }
+        .feedback-buttons .btn {
+            margin: 5px;
+            background-color: #28a745;
+        }
+        .feedback-buttons .btn.no {
+            background-color: #dc3545;
+        }
+
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        .result {
+            margin-top: 10px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            background-color: #fafafa;
+        }
+
+        .draggable-container {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 250px;
+            background: rgba(224, 224, 224, 0.497);
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0px 0px 10px rgba(140, 115, 115, 0.1);
+            cursor: move;
+        }
+     
+        .header {
+            cursor: move;
+            padding: 10px;
+            background-color: #007BFF;
+            color: white;
+            border-radius: 5px 5px 0 0;
+            text-align: center;
+        }
+        #monitorData {
+            padding: 10px;
+        }    
+
+    </style>
+</head>
+<body>
+
+    <!-- Menu for navigation -->
+    <div id="menu">
+        <label for="navigation">Navigate: </label>
+        <select id="navigation" onchange="navigateToPage(this.value)">
+            <option value="index.html">Data Visualization</option>
+            <option value="monitor.html" selected>Monitor</option>
+            <option value="phase.html">Phase Monitor</option>
+        </select>
+    </div>
+    
+    <h1>Monitor</h1>
+
+    <!-- Image Classifier Section -->
+    <div class="container">
+        <h2>Image Classifier</h2>
+        <label for="fileInput">Upload an image:</label>
+        <input type="file" id="fileInput" accept="image/*">
+        <button id="uploadButton">Upload & Classify</button>
+        <div id="result" class="result" style="display: none;"></div>
+    </div>
+
+
+    <!-- Draggable Data Display -->
+    <div class="draggable-container" id="dragContainer">
+        <div class="header" id="dragHeader">Monitor Data</div>
+        <div id="monitorData">Waiting for data...</div>
+    </div>
+    <script>
+        const root = config.ROOT_URL;
+        // Function to navigate between pages
+        function navigateToPage(page) {
+            if (page) {
+                window.location.href = page;
+            }
+        }
+
+        // Upload and classify image
+        document.getElementById("uploadButton").addEventListener("click", async () => {
+            const fileInput = document.getElementById("fileInput");
+            if (!fileInput.files.length) return;
+
+            const formData = new FormData();
+            formData.append("file", fileInput.files[0]);
+            
+            document.getElementById("result").style.display = "none";
+            
+            try {
+                const response = await fetch(`${root}8000/api/classify`, {
+                    method: "POST",
+                    body: formData,
+                });
+                const data = await response.json();
+                
+                document.getElementById("result").style.display = "block";
+                document.getElementById("result").innerHTML = 
+                    `<p><strong>Result:</strong> ${data.class}</p>
+                     <p><strong>Confidence:</strong> ${data.confidence}%</p>`;
+            } catch (error) {
+                console.error("Error uploading image:", error);
+            }
+        });
+         
+
+        // Dragging functionality
+        const dragContainer = document.getElementById("dragContainer");
+        const dragHeader = document.getElementById("dragHeader");
+
+        dragHeader.addEventListener("mousedown", function (e) {
+            let offsetX = e.clientX - dragContainer.offsetLeft;
+            let offsetY = e.clientY - dragContainer.offsetTop;
+
+            function onMouseMove(e) {
+                dragContainer.style.left = e.clientX - offsetX + "px";
+                dragContainer.style.top = e.clientY - offsetY + "px";
+            }
+
+            document.addEventListener("mousemove", onMouseMove);
+
+            document.addEventListener("mouseup", function () {
+                document.removeEventListener("mousemove", onMouseMove);
+            }, { once: true });
+        });
+         
+        async function fetchMonitorData() {
+    try {
+        // Update the URL to the correct endpoint
+        const response = await fetch(`${root}8000/receive_data`);
+        
+        // Check if the response is okay (status 200-299)
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        // Parse the JSON response
+        const data = await response.json();
+
+        // Safely format numbers with .toFixed(3), defaulting to 0 if null or undefined
+        const formatNumber = (value) => (value ?? 0).toFixed(3);
+
+        // Update the HTML with the fetched data
+        document.getElementById("monitorData").innerHTML = `
+<header>
+     
+    <div><strong style="background-color: rgba(255, 0, 0, 1); padding: 1px;">Motor Temperature: ${formatNumber(data.Motor_Temperature)} °C</strong></div>
+    <div><strong style="background-color: rgba(0, 200, 0, 1); padding: 1px;">Ambient Temperature: ${formatNumber(data.Ambient_Temperature)} °C</strong></div>
+<div><strong style="background-color: rgba(0, 200, 0, 1); padding: 1px;">RPM: ${formatNumber(data.RPM)} </strong></div>
+<p><strong style="background-color: rgba(0, 0, 0, 1); padding: 1px;">U RMS Current: ${formatNumber(data.U_rms_current)}A <br> U RMS Voltage: ${formatNumber(data.U_rms_voltage)}V <br> U Power Factor: ${formatNumber(data.U_PF)}</strong></p>
+
+<p><strong style="background-color: rgba(255, 0, 0, 0.7); padding: 1px;">V RMS Current: ${formatNumber(data.V_rms_current)}A <br> V RMS Voltage: ${formatNumber(data.V_rms_voltage)}V <br> V Power Factor: ${formatNumber(data.V_PF)}</strong></p>
+
+<p><strong style="background-color: rgba(0, 0, 255, 0.7); padding: 1px;">W RMS Current: ${formatNumber(data.W_rms_current)}A <br> W RMS Voltage: ${formatNumber(data.W_rms_voltage)}V <br> W Power Factor: ${formatNumber(data.W_PF)}</strong></p>
+  
+`;
+    } catch (error) {
+        console.error("Error fetching monitor data:", error);
+
+        // Display an error message in the HTML
+        document.getElementById("monitorData").innerHTML = `
+<header>
+    <div style="color: red; font-weight: bold;">Error fetching monitor data. Please try again later.</div>
+</header>
+        `;
+    }
+}
+
+// Fetch data every second
+setInterval(fetchMonitorData, 1000);  
+    </script>
+
+</body>
+</html>
